@@ -25,26 +25,26 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - name: Lint
-        - run: |
+          run: |
             pylint
   flake8:
       need: [ build ]
       runs-on: ubuntu-latest
       steps:
         - name: flake8
-        - run: |
+          run: |
             flake8
   mypy:
       need: [ build ]
       runs-on: ubuntu-latest
       steps:
         - name: mypy
-        - run: |
+          run: |
             mypy
   black:
       need: [ build ]
       runs-on: ubuntu-latest
       steps:
         - name: black
-        - run: |
+          run: |
             black
