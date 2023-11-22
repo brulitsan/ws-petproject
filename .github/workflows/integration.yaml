@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -21,11 +20,31 @@ jobs:
         run: |
             python -m pip install --upgrade pip
             pip install flake8 mypy isort black pylint
-
-      - name: Lint and Format
+  lint:
+      - need: [build]
+      - runs-on: ubuntu-latest
+      - steps:
+        - name: Lint
         run: |
-          flake8
-          mypy
-          isort
-          black
-          pylint
+            pylint
+  flake8:
+    - need: [ build ]
+    - runs-on: ubuntu-latest
+    - steps:
+        - name: flake8
+      run: |
+        flake8
+  mypy:
+    - need: [ build ]
+    - runs-on: ubuntu-latest
+    - steps:
+        - name: mypy
+      run: |
+        mypy
+  black:
+    - need: [ build ]
+    - runs-on: ubuntu-latest
+    - steps:
+        - name: black
+      run: |
+        black
