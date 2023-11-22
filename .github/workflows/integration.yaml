@@ -21,30 +21,30 @@ jobs:
             python -m pip install --upgrade pip
             pip install flake8 mypy isort black pylint
   lint:
-      - need: [build]
-      - runs-on: ubuntu-latest
-      - steps:
+      need: [build]
+      runs-on: ubuntu-latest
+      steps:
         - name: Lint
-        run: |
+        - run: |
             pylint
   flake8:
-    - need: [ build ]
-    - runs-on: ubuntu-latest
-    - steps:
+      need: [ build ]
+      runs-on: ubuntu-latest
+      steps:
         - name: flake8
-      run: |
-        flake8
+        - run: |
+            flake8
   mypy:
-    - need: [ build ]
-    - runs-on: ubuntu-latest
-    - steps:
+      need: [ build ]
+      runs-on: ubuntu-latest
+      steps:
         - name: mypy
-      run: |
-        mypy
+        - run: |
+            mypy
   black:
-    - need: [ build ]
-    - runs-on: ubuntu-latest
-    - steps:
+      need: [ build ]
+      runs-on: ubuntu-latest
+      steps:
         - name: black
-      run: |
-        black
+        - run: |
+            black
