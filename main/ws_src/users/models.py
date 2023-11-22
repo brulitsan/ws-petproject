@@ -23,6 +23,7 @@ class User(AbstractUser):
     email = models.EmailField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
+    user_balance = models.DecimalField(decimal_places=3)
 
 
 class UserProfile(models.Model):
