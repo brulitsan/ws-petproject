@@ -29,7 +29,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 LOCAL_APPS = [
-    'users'
+    'ws_src.common',
+    'ws_src.stock_market',
+    'ws_src.users',
 ]
 
 DJANGO_APPS = [
