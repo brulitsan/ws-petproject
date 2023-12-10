@@ -1,18 +1,58 @@
 version: '3'
 
+
 services:
-  web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
+  ws-petproject:
+    image: ws-petproject
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    expose:
+      - 8000
     ports:
-      - "8000:8000"
-#    depends_on:
-#      - db
-#  db:
-#    image: postgres:13
-#    environment:
-#      - POSTGRES_DB=postgres
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_PASSWORD=postgres
+      - 8000:8000
+    environment:
+      - SECRET_KEY=$SECRET_KEY
+    volumes:
+      - ./main/app:/app
+    depends_on:
+      - db
+      - mongo
+      - celery
+      - redis
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ${DATABASE_DIR:-./database_data}:/var/lib/postgresql/data
+
+
+  mongo:
+    image: mongo:latest
+    volumes:
+      - ${MONGO_DIR:-./mongo_data}:/var/lib/mongo_db/data
+
+  redis:
+    image: redis:latest
+    restart: always
+
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A main worker --loglevel=info
+    volumes:
+      - ./main:/app
+    environment:
+      - SECRET_KEY=$SECRET_KEY
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db

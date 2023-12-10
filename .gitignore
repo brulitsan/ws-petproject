@@ -3,3 +3,7 @@ venv
 *.sqlite3
 .env
 __pycache__/
+database_data
+.mypy_cache
+mongo_data
+ws-petproject
