@@ -41,8 +41,6 @@ class User(AbstractUser):
         related_name="custom_user_set",
         related_query_name="user",
     )
-    access_token = models.CharField(max_length=255, blank=True)
-    refresh_token = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return f"username {self.username} | user id - {self.id}"

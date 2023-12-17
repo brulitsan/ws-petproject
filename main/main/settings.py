@@ -38,6 +38,7 @@ LOCAL_APPS = [
     "ws_src.common.apps.CommonConfig",
     "ws_src.stock_market.apps.StockMarketConfig",
     "ws_src.users.apps.UsersConfig",
+    "ws_src.registration.apps.RegistrationConfig",
 ]
 
 DJANGO_APPS = [
@@ -49,7 +50,9 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    'rest_framework'
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -92,7 +95,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB'),
         'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
+        'HOST': 'database',
         'PORT': '5432',
     }
 }
