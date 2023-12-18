@@ -30,6 +30,7 @@ class RegisterUserView(APIView):
 
 class LoginUserView(APIView):
     def post(self, request):
+        id = request.data.get('id')
         password = request.data.get('password')
         try:
             user = User.objects.get(id=id)
