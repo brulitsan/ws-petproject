@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -10,15 +11,15 @@ from ws_src.users.models import User
 def generate_token(
         user,
         minutes,
-    ):
+):
     payload = {
         'id': user.id,
         'exp': datetime.utcnow() + timedelta(minutes=minutes)
     }
     token = jwt.encode(
         payload,
-        'django-insecure-nn+8rknd1qy2fj7eju#(q=5vts3%fah--hg7j@1)1%3!go6z6%',
-        algorithm='HS256'
+        os.environ.get('SECRET_KEY'),
+        algorithm=os.environ.get('ALGORITHM')
     )
     return token
 

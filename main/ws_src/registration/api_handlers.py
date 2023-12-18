@@ -1,8 +1,11 @@
+import os
+
+import jwt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ws_src.users.models import User
+from users.models import User
 from .dependencies import create_user, generate_token
 from .serialiser import UserSerialiser
 
@@ -12,21 +15,30 @@ class RegisterUserView(APIView):
         serializer = UserSerialiser(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = create_user(request)
-        assign_token_view = AssignTokenView()
-        assign_token_view.post(request)
-        return Response({'message': 'Данные получены'}, status=status.HTTP_200_OK)
-
-
-class AssignTokenView(APIView):
-    def post(self, request):
-        user = User.objects.get(id=request.data['id'])
         access_token = generate_token(user, 15)
-        refresh_token = generate_token(user, 24*60)
-        request.session['access_token'] = access_token
-        request.session['refresh_token'] = refresh_token
-        return Response(status=status.HTTP_200_OK)
+        refresh_token = generate_token(user, 3600)
+        return f"access: {access_token}, refresh: {refresh_token}"
 
-    def get(self, request):
-        access_token = request.session.get('access_token')
-        refresh_token = request.session.get('refresh_token')
-        return Response(status=status.HTTP_200_OK)
+    def refresh_access_token(self, refresh_token):
+        payload = jwt.decode(refresh_token, options={"verify_exp": False})
+        new_access_token = jwt.encode(
+            payload,
+            os.environ.get('SECRET_KEY'),
+            algorithm=os.environ.get('ALGORITHM'))
+        return new_access_token
+
+
+class LoginUserView(APIView):
+    def post(self, request):
+        password = request.data.get('password')
+        try:
+            user = User.objects.get(id=id)
+            if user.check_password(password):
+                access_token = generate_token(user.id, 15)
+                refresh_token = generate_token(user.id, 3600)
+                return Response({'access_token': access_token, 'refresh_token': refresh_token},
+                                status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+        except User is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
