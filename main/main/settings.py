@@ -51,7 +51,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'rest_framework'
+    'rest_framework',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -138,3 +138,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+REFRESH_TOKEN_LIFE = os.environ.get('REFRESH_TOKEN_LIFE')
+ACCESS_TOKEN_LIFE = os.environ.get('ACCESS_TOKEN_LIFE')
+ALGORITHM = os.environ.get('ALGORITHM')

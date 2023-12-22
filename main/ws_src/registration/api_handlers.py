@@ -1,45 +1,60 @@
 import os
+from asyncio import exceptions
 
 import jwt
-from rest_framework import status
+from django.contrib.auth import authenticate
+from rest_framework import status, generics, exceptions
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from users.models import User
+from .schemas import UserRegisterData, UserLoginData
+
+from main.settings import ACCESS_TOKEN_LIFE, REFRESH_TOKEN_LIFE
 from .dependencies import create_user, generate_token
-from .serialiser import UserSerialiser
+from .serialiser import UserSerialiser, LoginSerializer
 
 
-class RegisterUserView(APIView):
+class RegisterUserView(
+    generics.GenericAPIView,
+):
     def post(self, request):
         serializer = UserSerialiser(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = create_user(request)
-        access_token = generate_token(user, 15)
-        refresh_token = generate_token(user, 3600)
-        return f"access: {access_token}, refresh: {refresh_token}"
+        if serializer.is_valid(raise_exception=True):
+            user_data = UserRegisterData(**serializer.validated_data)
+            user = create_user(user_data)
+            access_token = generate_token(user=user, minutes=ACCESS_TOKEN_LIFE)
+            refresh_token = generate_token(user=user, minutes=REFRESH_TOKEN_LIFE)
+            return Response({'access_token': access_token, 'refresh_token': refresh_token},
+                         status=status.HTTP_201_CREATED)
 
-    def refresh_access_token(self, refresh_token):
-        payload = jwt.decode(refresh_token, options={"verify_exp": False})
+
+class LoginView(generics.GenericAPIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_data = UserLoginData(**serializer.validated_data)
+        user = authenticate(
+            request,
+            username=user_data.username,
+            password=user_data.password,
+        )
+        if user is not None:
+            access_token = generate_token(user=user, minutes=ACCESS_TOKEN_LIFE)
+            refresh_token = generate_token(user=user, minutes=REFRESH_TOKEN_LIFE)
+            return Response({'access_token': access_token, 'refresh_token': refresh_token},
+                             status=status.HTTP_200_OK)
+        else:
+            raise exceptions.AuthenticationFailed('Invalid username or password')
+
+
+class RefreshTokenView(generics.GenericAPIView):
+    def post(self, request):
+        refresh_token = request.data.get('refresh_token')
+        payload = jwt.decode(refresh_token,
+                             key=os.environ.get('SECRET_KEY'),
+                             options={"verify_exp": False},
+                             algorithms=[os.environ.get('ALGORITHM')])
         new_access_token = jwt.encode(
             payload,
             os.environ.get('SECRET_KEY'),
             algorithm=os.environ.get('ALGORITHM'))
-        return new_access_token
-
-
-class LoginUserView(APIView):
-    def post(self, request):
-        id = request.data.get('id')
-        password = request.data.get('password')
-        try:
-            user = User.objects.get(id=id)
-            if user.check_password(password):
-                access_token = generate_token(user.id, 15)
-                refresh_token = generate_token(user.id, 3600)
-                return Response({'access_token': access_token, 'refresh_token': refresh_token},
-                                status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        except User is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({'access_token': new_access_token}, status=status.HTTP_200_OK)
