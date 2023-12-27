@@ -16,7 +16,7 @@ class User(AbstractUser):
     )
     role = models.CharField(choices=BaseUserTypes.choices, max_length=20)
     first_name = models.CharField(max_length=150, blank=True)
-    user_balance = models.DecimalField(decimal_places=3, max_digits=3)
+    user_balance = models.DecimalField(decimal_places=3, max_digits=10)
     last_name = models.CharField(max_length=150, blank=True)
     email = models.EmailField(blank=True, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -41,8 +41,6 @@ class User(AbstractUser):
         related_name="custom_user_set",
         related_query_name="user",
     )
-    access_token = models.CharField(max_length=255, blank=True)
-    refresh_token = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return f"username {self.username} | user id - {self.id}"

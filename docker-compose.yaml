@@ -13,17 +13,20 @@ services:
       - 8000:8000
     environment:
       - SECRET_KEY=$SECRET_KEY
+      - ACCESS_TOKEN_LIFE=$ACCESS_TOKEN_LIFE
+      - REFRESH_TOKEN_LIFE=$REFRESH_TOKEN_LIFE
+      - ALGORITHM=$ALGORITHM
     volumes:
       - ./main/app:/app
     depends_on:
-      - db
+      - database
       - mongo
       - celery
       - redis
     env_file:
       - ./.env
 
-  db:
+  database:
     image: postgres:13
     environment:
       - POSTGRES_DB=$POSTGRES_DB
@@ -49,7 +52,7 @@ services:
     restart: always
     build:
       context: .
-    command: celery -A main worker --loglevel=info
+    command: [ 'celery', '-A', 'config', 'worker' ]
     volumes:
       - ./main:/app
     environment:
@@ -58,6 +61,6 @@ services:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     depends_on:
-      - db
+      - database
     env_file:
       - ./.env
