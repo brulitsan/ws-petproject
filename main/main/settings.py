@@ -12,11 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 import sys
 from pathlib import Path
-
 from dotenv import load_dotenv
 
 load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR / "ws_src"))
@@ -64,6 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "main.middleware.AuthMiddleware"
 ]
 
 ROOT_URLCONF = "main.urls"
@@ -139,7 +138,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
+AUTH_USER_MODEL = 'users.User'
 REFRESH_TOKEN_LIFE = os.environ.get('REFRESH_TOKEN_LIFE')
 ACCESS_TOKEN_LIFE = os.environ.get('ACCESS_TOKEN_LIFE')
 ALGORITHM = os.environ.get('ALGORITHM')

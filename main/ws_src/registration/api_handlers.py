@@ -16,11 +16,14 @@ from .serialiser import UserSerialiser, LoginSerializer
 class RegisterUserView(
     generics.GenericAPIView,
 ):
+    serializer_class = UserSerialiser
+
     def post(self, request):
-        serializer = UserSerialiser(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user_data = UserRegisterData(**serializer.validated_data)
             user = create_user(user_data)
+            user.save()
             access_token = generate_token(user=user, minutes=ACCESS_TOKEN_LIFE)
             refresh_token = generate_token(user=user, minutes=REFRESH_TOKEN_LIFE)
             return Response({'access_token': access_token, 'refresh_token': refresh_token},
@@ -28,8 +31,10 @@ class RegisterUserView(
 
 
 class LoginView(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_data = UserLoginData(**serializer.validated_data)
         user = authenticate(
