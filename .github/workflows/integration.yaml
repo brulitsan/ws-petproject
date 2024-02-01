@@ -1,25 +1,47 @@
-name: Integration
-on: [push]
-permissions:
-  contents: read
-  packages: write
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Build Docker image
-        run: docker build -t brulitsan/ws-petproject .
-      - name: Push Docker image
-        run: docker push brulitsan/ws-petproject
-  lint:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: brulitsan/ws-petproject:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+        env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+
+  pylint:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - name: Lint
+      - name: pylint
         run: |
           docker run brulitsan/ws-petproject sh -c "pip install pylint && pylint ws-petproject/main"
+
   flake8:
     needs: [build]
     runs-on: ubuntu-latest
@@ -27,6 +49,7 @@ jobs:
       - name: flake8
         run: |
           docker run brulitsan/ws-petproject sh -c "pip install flake8 && flake8 ws-petproject/main"
+
   mypy:
     needs: [build]
     runs-on: ubuntu-latest
@@ -34,10 +57,11 @@ jobs:
       - name: mypy
         run: |
           docker run brulitsan/ws-petproject sh -c "pip install mypy && mypy ws-petproject/main"
+
   black:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: black
         run: |
-          docker run brulitsan/ws-petproject sh -c "pip install black && black --check ws-petproject/main
+          docker run brulitsan/ws-petproject sh -c "pip install black && black --check ws-petproject/main"
