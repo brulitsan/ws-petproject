@@ -7,7 +7,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build Docker image
-        run: docker build -t main:test-${{ github.sha }}
+        run: docker build -t main:test-${{ github.sha }} --target full .
   lint:
     needs: [build]
     runs-on: ubuntu-latest
