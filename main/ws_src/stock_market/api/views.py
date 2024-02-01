@@ -18,7 +18,7 @@ class StockMarketViewSet(viewsets.ViewSet):
     schema = ProductSchema
 
     def list(self, request):
-        url = os.environ.get('GET_COINS_URL')
+        url = os.environ.get("GET_COINS_URL")
         response = requests.get(url)
         crypto_list = response.json()
         self.update_or_create_products(crypto_list)

@@ -2,12 +2,12 @@ from decimal import Decimal
 
 from pydantic import BaseModel, Field
 
-from ws_src.stock_market.models import Product, ProductCategories
+from ws_src.stock_market.models import Product
 from ws_src.users.models import User
 
 
 class ProductSchema(BaseModel):
-    id: str = Field(alias='_id')
+    id: str = Field(alias="_id")
     symbol: str
     lastPrice: Decimal
     highPrice: Decimal

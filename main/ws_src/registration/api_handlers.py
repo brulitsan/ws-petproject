@@ -3,7 +3,7 @@ from asyncio import exceptions
 
 import jwt
 from django.contrib.auth import authenticate
-from rest_framework import status, generics, exceptions
+from rest_framework import status, generics
 from rest_framework.response import Response
 
 from .schemas import UserRegisterSchema, UserLoginSchema
@@ -26,8 +26,10 @@ class RegisterUserView(
         print(user)
         access_token = generate_token(user=user, minutes=settings.ACCESS_TOKEN_LIFE)
         refresh_token = generate_token(user=user, minutes=settings.REFRESH_TOKEN_LIFE)
-        return Response({'access_token': access_token, 'refresh_token': refresh_token},
-                         status=status.HTTP_201_CREATED)
+        return Response(
+            {"access_token": access_token, "refresh_token": refresh_token},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class LoginView(generics.GenericAPIView):
@@ -44,22 +46,27 @@ class LoginView(generics.GenericAPIView):
         )
         if user is not None:
             access_token = generate_token(user=user, minutes=settings.ACCESS_TOKEN_LIFE)
-            refresh_token = generate_token(user=user, minutes=settings.REFRESH_TOKEN_LIFE)
-            return Response({'access_token': access_token, 'refresh_token': refresh_token},
-                             status=status.HTTP_200_OK)
+            refresh_token = generate_token(
+                user=user, minutes=settings.REFRESH_TOKEN_LIFE
+            )
+            return Response(
+                {"access_token": access_token, "refresh_token": refresh_token},
+                status=status.HTTP_200_OK,
+            )
         else:
-            raise exceptions.AuthenticationFailed('Invalid username or password')
+            raise exceptions.AuthenticationFailed("Invalid username or password")
 
 
 class RefreshTokenView(generics.GenericAPIView):
     def post(self, request):
-        refresh_token = request.data.get('refresh_token')
-        payload = jwt.decode(refresh_token,
-                             key=os.environ.get('SECRET_KEY'),
-                             options={"verify_exp": False},
-                             algorithms=[os.environ.get('ALGORITHM')])
+        refresh_token = request.data.get("refresh_token")
+        payload = jwt.decode(
+            refresh_token,
+            key=os.environ.get("SECRET_KEY"),
+            options={"verify_exp": False},
+            algorithms=[os.environ.get("ALGORITHM")],
+        )
         new_access_token = jwt.encode(
-            payload,
-            os.environ.get('SECRET_KEY'),
-            algorithm=os.environ.get('ALGORITHM'))
-        return Response({'access_token': new_access_token}, status=status.HTTP_200_OK)
+            payload, os.environ.get("SECRET_KEY"), algorithm=os.environ.get("ALGORITHM")
+        )
+        return Response({"access_token": new_access_token}, status=status.HTTP_200_OK)

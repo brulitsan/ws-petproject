@@ -1,7 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
-from django.http import JsonResponse
-
-from ws_src.registration.dependencies import is_authenticated
+from main.ws_src.registration.dependencies import is_authenticated
 
 
 class AuthMiddleware:

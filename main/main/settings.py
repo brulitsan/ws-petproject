@@ -49,7 +49,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'rest_framework',
+    "rest_framework",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -62,7 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "main.middleware.AuthMiddleware"
+    "main.middleware.AuthMiddleware",
 ]
 
 ROOT_URLCONF = "main.urls"
@@ -89,13 +89,13 @@ WSGI_APPLICATION = "main.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': os.environ.get('POSTGRES_HOST'),
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": os.environ.get("POSTGRES_HOST"),
+        "PORT": "5432",
     }
 }
 
@@ -138,7 +138,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'users.User'
-REFRESH_TOKEN_LIFE = os.environ.get('REFRESH_TOKEN_LIFE')
-ACCESS_TOKEN_LIFE = os.environ.get('ACCESS_TOKEN_LIFE')
-ALGORITHM = os.environ.get('ALGORITHM')
+AUTH_USER_MODEL = "users.User"
+REFRESH_TOKEN_LIFE = os.environ.get("REFRESH_TOKEN_LIFE")
+ACCESS_TOKEN_LIFE = os.environ.get("ACCESS_TOKEN_LIFE")
+ALGORITHM = os.environ.get("ALGORITHM")

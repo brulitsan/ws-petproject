@@ -1,5 +1,3 @@
-import uuid
-
 from django.db import models
 from ws_src.common.choices import BaseOrderType, BaseProductType
 from ws_src.common.models import BaseModel
@@ -7,7 +5,7 @@ from ws_src.common.models import BaseModel
 
 class ProductCategories(BaseModel):
     name = models.CharField(max_length=30, choices=BaseProductType.choices)
-    parent = models.ForeignKey("self", on_delete=models.PROTECT,  null=True, blank=True)
+    parent = models.ForeignKey("self", on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return (

@@ -3,12 +3,14 @@ from django.db import models
 
 from ws_src.common.models import BaseModel
 from ws_src.common.choices import BaseUserTypes
-from django.contrib.auth.models import AbstractUser, Permission, Group
+from django.contrib.auth.models import AbstractUser, Group
 
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    role = models.CharField(choices=BaseUserTypes.choices, max_length=20, default=BaseUserTypes.DEFAULT_USER)
+    role = models.CharField(
+        choices=BaseUserTypes.choices, max_length=20, default=BaseUserTypes.DEFAULT_USER
+    )
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
     email = models.EmailField(blank=True, unique=True)
