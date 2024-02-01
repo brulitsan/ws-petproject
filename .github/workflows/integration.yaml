@@ -3,6 +3,7 @@ on: [push]
 permissions:
   contents: read
   packages: write
+  registry: write
 jobs:
   build:
     runs-on: ubuntu-latest
