@@ -6,9 +6,9 @@ from django.contrib.auth import authenticate
 from rest_framework import status, generics, exceptions
 from rest_framework.response import Response
 
-from .schemas import UserRegisterData, UserLoginData
+from .schemas import UserRegisterSchema, UserLoginSchema
 
-from main.settings import ACCESS_TOKEN_LIFE, REFRESH_TOKEN_LIFE
+from django.conf import settings
 from .dependencies import create_user, generate_token
 from .serialiser import UserSerialiser, LoginSerializer
 
@@ -20,13 +20,13 @@ class RegisterUserView(
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user_data = UserRegisterData(**serializer.validated_data)
-            user = create_user(user_data)
-            user.save()
-            access_token = generate_token(user=user, minutes=ACCESS_TOKEN_LIFE)
-            refresh_token = generate_token(user=user, minutes=REFRESH_TOKEN_LIFE)
-            return Response({'access_token': access_token, 'refresh_token': refresh_token},
+        serializer.is_valid(raise_exception=True)
+        user_data = UserRegisterSchema(**serializer.validated_data)
+        user = create_user(user_data)
+        print(user)
+        access_token = generate_token(user=user, minutes=settings.ACCESS_TOKEN_LIFE)
+        refresh_token = generate_token(user=user, minutes=settings.REFRESH_TOKEN_LIFE)
+        return Response({'access_token': access_token, 'refresh_token': refresh_token},
                          status=status.HTTP_201_CREATED)
 
 
@@ -36,15 +36,15 @@ class LoginView(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user_data = UserLoginData(**serializer.validated_data)
+        user_data = UserLoginSchema(**serializer.validated_data)
         user = authenticate(
             request,
             username=user_data.username,
             password=user_data.password,
         )
         if user is not None:
-            access_token = generate_token(user=user, minutes=ACCESS_TOKEN_LIFE)
-            refresh_token = generate_token(user=user, minutes=REFRESH_TOKEN_LIFE)
+            access_token = generate_token(user=user, minutes=settings.ACCESS_TOKEN_LIFE)
+            refresh_token = generate_token(user=user, minutes=settings.REFRESH_TOKEN_LIFE)
             return Response({'access_token': access_token, 'refresh_token': refresh_token},
                              status=status.HTTP_200_OK)
         else:

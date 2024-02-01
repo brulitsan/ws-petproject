@@ -1,26 +1,23 @@
 import os
 
-from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import GenericViewSet
-from rest_framework import mixins
+from rest_framework import mixins, viewsets
 
 import requests
-from django.db import transaction
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from ws_src.users.permissions import IsUser
 from ws_src.users.database import update_or_create_user_product, update_user_balance
-from ws_src.stock_market.database import update_or_create_product
 
 from ws_src.stock_market.models import Product, ProductCategories
 from ws_src.stock_market.api.serialiser import OrderSerializer
-from ws_src.stock_market.schemas import ProductModel, OrderDto
+from ws_src.stock_market.schemas import ProductSchema, OrderSchema
 
 
-class StockMarketView(APIView):
+class StockMarketViewSet(viewsets.ViewSet):
+    schema = ProductSchema
 
-    def get(self, request):
+    def list(self, request):
         url = os.environ.get('GET_COINS_URL')
         response = requests.get(url)
         crypto_list = response.json()
@@ -28,22 +25,11 @@ class StockMarketView(APIView):
         return Response(crypto_list)
 
     @staticmethod
-    def update_or_create_products(product_data: list[ProductModel]):
-        with transaction.atomic():
-            for item in product_data:
-                item = ProductModel(**item)
-                category, _ = ProductCategories.objects.get_or_create(name=item.symbol)
-                product, created = update_or_create_product(
-                    item.id,
-                    category,
-                    item.lastPrice,
-                    item.highPrice,
-                    item.lowPrice
-                )
-                if created:
-                    print(f'Создан новый продукт: {product}')
-                else:
-                    print(f'Обновлен продукт: {product}')
+    def update_or_create_products(product_data):
+        for item in product_data:
+            item = ProductSchema(**item)
+            category, _ = ProductCategories.objects.get_or_create(name=item.symbol)
+            product, created = Product.objects.update_or_create(id=item.id, defaults=item.model_dump())
 
 
 class BuyItemViewSet(mixins.CreateModelMixin, GenericViewSet):
@@ -53,13 +39,8 @@ class BuyItemViewSet(mixins.CreateModelMixin, GenericViewSet):
 
     def perform_create(self, serializer):
         user = self.request.current_user
-        order_dto = OrderDto(user=user, **serializer.validated_data)
+        order_dto = OrderSchema(user=user, **serializer.validated_data)
         serializer.save(**order_dto.model_dump())
 
         update_user_balance(user, order_dto)
         update_or_create_user_product(user, order_dto)
-
-
-
-
-

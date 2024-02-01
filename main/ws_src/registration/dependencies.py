@@ -1,19 +1,18 @@
 import os
-from datetime import datetime, timedelta
-from django.contrib.auth import authenticate as auth
-
+from datetime import timedelta
+from http.client import HTTPException
+from django.utils import timezone
 import jwt
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AnonymousUser
-from django.http import JsonResponse
 from rest_framework import status
 
-from main import settings
-from ws_src.users.models import User
-from .schemas import UserRegisterData
+from django.conf import settings
 
-from main.settings import ALGORITHM, SECRET_KEY
+
+from ws_src.users.models import User
+from ws_src.registration.schemas import UserRegisterSchema
 
 def generate_token(
         user,
@@ -21,26 +20,21 @@ def generate_token(
 ):
     payload = {
         'id': str(user.id),
-        'exp': datetime.utcnow() + timedelta(minutes=int(minutes))
+        'exp': timezone.now() + timedelta(minutes=int(minutes))
     }
     token = jwt.encode(
         payload,
-        SECRET_KEY,
+        settings.SECRET_KEY,
         algorithm=os.environ.get('ALGORITHM')
     )
     return token
 
 
-def create_user(data: UserRegisterData):
+def create_user(data: UserRegisterSchema):
     User = get_user_model()
-    user = User(
-        username=data.username,
-        password=make_password(data.password),
-        email=data.email,
-        first_name=data.first_name,
-        last_name=data.last_name,
-        role=data.role
-    )
+    user_properties = data.model_dump()
+    user_properties['password'] = make_password(data.password)
+    user = User(**user_properties)
     user.save()
     return user
 
@@ -56,8 +50,7 @@ def is_authenticated(request):
             return user
 
         except jwt.ExpiredSignatureError:
-            return None
+            return HTTPException(status=status.HTTP_403_FORBIDDEN)
         except jwt.InvalidTokenError:
-            return None
-    return None
-    # return AnonymousUser
+            return HTTPException(status=status.HTTP_401_UNAUTHORIZED)
+    return AnonymousUser

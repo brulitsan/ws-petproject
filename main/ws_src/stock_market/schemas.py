@@ -1,35 +1,24 @@
-import uuid
+from decimal import Decimal
 
 from pydantic import BaseModel, Field
 
+from ws_src.stock_market.models import Product, ProductCategories
 from ws_src.users.models import User
 
 
-class StockMarketBuy(BaseModel):
-    product_id: str
-    purchase_amount: float
-    order_type: str
-
-
-class StockMarketSell(BaseModel):
-    product_id: str
-    sale_amount: float
-    order_type: str
-
-
-class ProductModel(BaseModel):
+class ProductSchema(BaseModel):
     id: str = Field(alias='_id')
     symbol: str
-    highPrice: float
-    lowPrice: float
-    lastPrice: float
+    lastPrice: Decimal
+    highPrice: Decimal
+    lowPrice: Decimal
 
 
-class OrderDto(BaseModel):
+class OrderSchema(BaseModel):
     user: User
-    product_id: str
-    transaction_price: float
-    quantity: float
+    product: Product
+    transaction_price: Decimal
+    quantity: Decimal
     type: str
 
     class Config:

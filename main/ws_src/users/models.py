@@ -12,7 +12,7 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
     email = models.EmailField(blank=True, unique=True)
-    balance = models.DecimalField(decimal_places=3, max_digits=10)
+    balance = models.DecimalField(decimal_places=3, max_digits=10, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
     groups = models.ManyToManyField(

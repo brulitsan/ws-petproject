@@ -11,7 +11,7 @@ class AuthMiddleware:
     def __call__(self, request):
         user = is_authenticated(request)
         request.current_user = user
-        if isinstance(user, JsonResponse):
-            request.current_user = None
+        if request.current_user == AnonymousUser:
+            request.current_user = False
         response = self.get_response(request)
         return response

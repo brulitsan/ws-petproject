@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from ws_src.common.choices import BaseOrderType, BaseProductType
 from ws_src.common.models import BaseModel
@@ -21,14 +23,14 @@ class Product(models.Model):
         verbose_name_plural = "Products"
 
     id = models.CharField(primary_key=True, editable=False)
-    name = models.ForeignKey(ProductCategories, on_delete=models.PROTECT, default="")
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    max_price = models.DecimalField(max_digits=10, decimal_places=3)
-    min_price = models.DecimalField(max_digits=10, decimal_places=2)
+    symbol = models.CharField(max_length=100, unique=True)
+    lastPrice = models.DecimalField(max_digits=10, decimal_places=2)
+    highPrice = models.DecimalField(max_digits=10, decimal_places=3)
+    lowPrice = models.DecimalField(max_digits=10, decimal_places=2)
 
 
 class Order(models.Model):
-    product_id = models.CharField(max_length=100)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
     user = models.ForeignKey("users.User", on_delete=models.PROTECT)
     transaction_price = models.DecimalField(max_digits=10, decimal_places=3)
     quantity = models.DecimalField(max_digits=10, decimal_places=4)
