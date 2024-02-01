@@ -12,13 +12,17 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
+      - name: Pull Docker image
+        run: docker pull myapp:latest
       - name: Lint
         run: |
-          docker run myapp sh -c "pip install pylint && pylint app/main"
+          docker run myapp sh -c "pip install pylint && pylint ws-petproject/main"
   flake8:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
+      - name: Pull Docker image
+        run: docker pull myapp:latest
       - name: flake8
         run: |
           docker run myapp sh -c "pip install flake8 && flake8 ws-petproject/main"
@@ -26,6 +30,8 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
+      - name: Pull Docker image
+        run: docker pull myapp:latest
       - name: mypy
         run: |
           docker run myapp sh -c "pip install mypy && mypy ws-petproject/main"
@@ -33,6 +39,8 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
+      - name: Pull Docker image
+        run: docker pull myapp:latest
       - name: black
         run: |
-          docker run myapp sh -c "pip install black && black --check app/main
+          docker run myapp sh -c "pip install black && black --check ws-petproject/main"
