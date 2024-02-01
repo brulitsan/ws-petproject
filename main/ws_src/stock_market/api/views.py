@@ -29,7 +29,7 @@ class StockMarketViewSet(viewsets.ViewSet):
         for item in product_data:
             item = ProductSchema(**item)
             category, _ = ProductCategories.objects.get_or_create(name=item.symbol)
-            product, created = Product.objects.update_or_create(id=item.id, defaults=item.model_dump())
+            Product.objects.update_or_create(id=item.id, defaults=item.model_dump())
 
 
 class BuyItemViewSet(mixins.CreateModelMixin, GenericViewSet):
