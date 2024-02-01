@@ -7,38 +7,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build Docker image
-        run: docker build -t main:test-${{ github.sha }} --target full .
+        run: docker build -t app .
   lint:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: Lint
         run: |
-          docker run --rm main:test-${{ github.sha }} pylint /app/main
+          docker run myapp sh -c "pip install pylint && pylint app/main"
   flake8:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - name: Pull Docker image
-        run: docker pull app:latest
       - name: flake8
         run: |
-          docker run --rm main:test-${{ github.sha }} flake8 /app/main
+          docker run myapp sh -c "pip install flake8 && flake8 app/main"
   mypy:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - name: Pull Docker image
-        run: docker pull app:latest
       - name: mypy
         run: |
-          docker run --rm main:test-${{ github.sha }} mypy /app/main
+          docker run myapp sh -c "pip install mypy && mypy app/main"
   black:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - name: Pull Docker image
-        run: docker pull app:latest
       - name: black
         run: |
-          docker run --rm main:test-${{ github.sha }} black /app/main
+          docker run myapp sh -c "pip install black && black --check app/main
