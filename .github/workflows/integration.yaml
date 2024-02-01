@@ -7,32 +7,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build Docker image
-        run: docker build -t app .
+        run: docker build -t brulitsan/ws-petproject .
+      - name: Push Docker image
+        run: docker push brulitsan/ws-petproject
   lint:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: Lint
         run: |
-          docker run app sh -c "pip install pylint && pylint app/main"
+          docker run brulitsan/ws-petproject sh -c "pip install pylint && pylint ws-petproject/main"
   flake8:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: flake8
         run: |
-          docker run app sh -c "pip install flake8 && flake8 app/main"
+          docker run brulitsan/ws-petproject sh -c "pip install flake8 && flake8 ws-petproject/main"
   mypy:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: mypy
         run: |
-          docker run app sh -c "pip install mypy && mypy app/main"
+          docker run brulitsan/ws-petproject sh -c "pip install mypy && mypy ws-petproject/main"
   black:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: black
         run: |
-          docker run app sh -c "pip install black && black --check app/main
+          docker run brulitsan/ws-petproject sh -c "pip install black && black --check ws-petproject/main"
