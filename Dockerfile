@@ -7,12 +7,10 @@ WORKDIR /app
 
 COPY pyproject.toml poetry.lock* /app/
 
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir --upgrade poetry==$POETRY_VERSION
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && pip install poetry==1.7.1
 
 COPY . .
-
-RUN poetry config virtualenvs.create false
-RUN poetry install
 
 CMD ["python", "/app/manage.py", "runserver", "0.0.0.0:8000"]
