@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Lint
         run: |
-          docker run myapp sh -c "pip install pylint && pylint ws-petproject/main"
+          docker run myapp sh -c "pip install pylint && pylint app/main"
   flake8:
     needs: [build]
     runs-on: ubuntu-latest
@@ -35,4 +35,4 @@ jobs:
     steps:
       - name: black
         run: |
-          docker run myapp sh -c "pip install black && black --check ws-petproject/main
+          docker run myapp sh -c "pip install black && black --check app/main

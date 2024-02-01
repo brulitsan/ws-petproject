@@ -20,7 +20,6 @@ services:
       - ./main/app:/app
     depends_on:
       - database
-      - mongo
       - celery
       - redis
     env_file:
@@ -38,11 +37,6 @@ services:
       - ${DATABASE_DIR:-./database_data}:/var/lib/postgresql/data
     env_file:
       - ./.env
-
-  mongo:
-    image: mongo:latest
-    volumes:
-      - ${MONGO_DIR:-./mongo_data}:/var/lib/mongo_db/data
 
   redis:
     image: redis:latest
