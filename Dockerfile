@@ -1,21 +1,18 @@
-FROM python:3.11
+FROM python:3.8
+
+ENV POETRY_HOME /app
+ENV POETRY_VERSION 1.7.1
 
 WORKDIR /app
 
-COPY . /app
+COPY pyproject.toml poetry.lock* /app/
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir --upgrade poetry==$POETRY_VERSION
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && pip install poetry==1.7.1
+COPY . .
 
-COPY ./pyproject.toml /app/pyproject.toml
-COPY ./poetry.lock /app/poetry.lock
+RUN poetry config virtualenvs.create false
+RUN poetry install
 
-EXPOSE 8000
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-
-
+CMD ["python", "/app/manage.py", "runserver", "0.0.0.0:8000"]
