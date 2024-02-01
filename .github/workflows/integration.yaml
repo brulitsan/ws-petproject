@@ -7,16 +7,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build Docker image
-        run: docker build -t app .
+        run: docker build -t main:test-${{ github.sha }}
   lint:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - name: Pull Docker image
-        run: docker pull app:latest
       - name: Lint
         run: |
-          docker run myapp sh -c "pip install pylint && pylint ws-petproject/main"
+          docker run --rm main:test-${{ github.sha }} pylint /app/main
   flake8:
     needs: [build]
     runs-on: ubuntu-latest
@@ -25,7 +23,7 @@ jobs:
         run: docker pull app:latest
       - name: flake8
         run: |
-          docker run myapp sh -c "pip install flake8 && flake8 ws-petproject/main"
+          docker run --rm main:test-${{ github.sha }} flake8 /app/main
   mypy:
     needs: [build]
     runs-on: ubuntu-latest
@@ -34,7 +32,7 @@ jobs:
         run: docker pull app:latest
       - name: mypy
         run: |
-          docker run myapp sh -c "pip install mypy && mypy ws-petproject/main"
+          docker run --rm main:test-${{ github.sha }} mypy /app/main
   black:
     needs: [build]
     runs-on: ubuntu-latest
@@ -43,4 +41,4 @@ jobs:
         run: docker pull app:latest
       - name: black
         run: |
-          docker run myapp sh -c "pip install black && black --check ws-petproject/main"
+          docker run --rm main:test-${{ github.sha }} black /app/main
