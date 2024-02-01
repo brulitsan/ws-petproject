@@ -3,7 +3,6 @@ on: [push]
 permissions:
   contents: read
   packages: write
-  registry: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -41,4 +40,4 @@ jobs:
     steps:
       - name: black
         run: |
-          docker run brulitsan/ws-petproject sh -c "pip install black && black --check ws-petproject/main"
+          docker run brulitsan/ws-petproject sh -c "pip install black && black --check ws-petproject/main
