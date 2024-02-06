@@ -1,7 +1,6 @@
 from decimal import Decimal
 
 from pydantic import BaseModel, Field
-
 from ws_src.stock_market.models import Product
 from ws_src.users.models import User
 
@@ -9,9 +8,9 @@ from ws_src.users.models import User
 class ProductSchema(BaseModel):
     id: str = Field(alias="_id")
     symbol: str
-    lastPrice: Decimal
-    highPrice: Decimal
-    lowPrice: Decimal
+    last_price: Decimal = Field(alias="lastPrice")
+    high_price: Decimal = Field(alias="highPrice")
+    low_price: Decimal = Field(alias="lowPrice")
 
 
 class OrderSchema(BaseModel):

@@ -3,7 +3,7 @@ version: '3'
 
 services:
   ws-petproject:
-    image: ws-petproject
+    image: app
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -46,7 +46,7 @@ services:
     restart: always
     build:
       context: .
-    command: [ 'celery', '-A', 'config', 'worker' ]
+    command:  ['celery', '-A', 'main', 'worker']
     volumes:
       - ./main:/app
     environment:

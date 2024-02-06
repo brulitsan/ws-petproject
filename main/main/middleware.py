@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
-from main.ws_src.registration.dependencies import is_authenticated
+from ws_src.registration.dependencies import is_authenticated
 
 
 class AuthMiddleware:
@@ -10,6 +10,6 @@ class AuthMiddleware:
         user = is_authenticated(request)
         request.current_user = user
         if request.current_user == AnonymousUser:
-            request.current_user = False
+            request.current_user = None
         response = self.get_response(request)
         return response

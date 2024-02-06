@@ -17,6 +17,11 @@ python-dotenv = "^1.0.0"
 psycopg2-binary = "^2.9.9"
 pyjwt = "^2.8.0"
 pydantic = "^2.5.3"
+isort = "^5.13.2"
+pre-commit = "^3.6.0"
+gunicorn = "^21.2.0"
+djangorestframework-stubs = "^3.14.5"
+django-stubs = "^4.2.7"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.0.2"

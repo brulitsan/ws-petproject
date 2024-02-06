@@ -1,16 +1,20 @@
-FROM python:3.8
+# install requirements
+FROM python:3.11
 
-ENV POETRY_HOME /app
-ENV POETRY_VERSION 1.7.1
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock* /app/
+COPY . /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && pip install poetry==1.7.1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-COPY . .
 
-CMD ["python", "/manage.py", "runserver", "0.0.0.0:8000"]
+RUN pip install poetry==1.7.1
+
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+
+RUN pip install celery==5.3.5
+
+EXPOSE 8000
+
