@@ -1,60 +1,61 @@
-import os
-from asyncio import exceptions
-
-import jwt
+from django.conf import settings
 from django.contrib.auth import authenticate
-from rest_framework import status, generics, exceptions
+from rest_framework import exceptions, generics, request, status
 from rest_framework.response import Response
 
-from .schemas import UserRegisterData, UserLoginData
-
-from main.settings import ACCESS_TOKEN_LIFE, REFRESH_TOKEN_LIFE
-from .dependencies import create_user, generate_token
-from .serialiser import UserSerialiser, LoginSerializer
+from .dependencies import generate_token
+from .repositories import create_user, decode_refresh_token, encode_access_token
+from .schemas import UserLoginSchema, UserRegisterSchema
+from .serialiser import LoginSerializer, UserSerialiser
 
 
 class RegisterUserView(
     generics.GenericAPIView,
 ):
+    serializer_class = UserSerialiser
+
     def post(self, request):
-        serializer = UserSerialiser(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user_data = UserRegisterData(**serializer.validated_data)
-            user = create_user(user_data)
-            access_token = generate_token(user=user, minutes=ACCESS_TOKEN_LIFE)
-            refresh_token = generate_token(user=user, minutes=REFRESH_TOKEN_LIFE)
-            return Response({'access_token': access_token, 'refresh_token': refresh_token},
-                         status=status.HTTP_201_CREATED)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_schema = UserRegisterSchema.model_validate(serializer.validated_data)
+        user = create_user(user_schema)
+        access_token = generate_token(user=user, minutes=settings.ACCESS_TOKEN_LIFE)
+        refresh_token = generate_token(user=user, minutes=settings.REFRESH_TOKEN_LIFE)
+        return Response(
+            {"access_token": access_token, "refresh_token": refresh_token},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class LoginView(generics.GenericAPIView):
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+    serializer_class = LoginSerializer
+
+    def post(self, request: request.Request) -> Response:
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user_data = UserLoginData(**serializer.validated_data)
+        user_data = UserLoginSchema(**serializer.validated_data)
         user = authenticate(
             request,
             username=user_data.username,
             password=user_data.password,
         )
-        if user is not None:
-            access_token = generate_token(user=user, minutes=ACCESS_TOKEN_LIFE)
-            refresh_token = generate_token(user=user, minutes=REFRESH_TOKEN_LIFE)
-            return Response({'access_token': access_token, 'refresh_token': refresh_token},
-                             status=status.HTTP_200_OK)
-        else:
-            raise exceptions.AuthenticationFailed('Invalid username or password')
+        if user is None:
+            raise exceptions.AuthenticationFailed("Invalid username or password")
+        access_token = generate_token(user=user, minutes=settings.ACCESS_TOKEN_LIFE)
+        refresh_token = generate_token(user=user, minutes=settings.REFRESH_TOKEN_LIFE)
+        return Response(
+            {"access_token": access_token, "refresh_token": refresh_token},
+            status=status.HTTP_200_OK,
+        )
 
 
 class RefreshTokenView(generics.GenericAPIView):
-    def post(self, request):
-        refresh_token = request.data.get('refresh_token')
-        payload = jwt.decode(refresh_token,
-                             key=os.environ.get('SECRET_KEY'),
-                             options={"verify_exp": False},
-                             algorithms=[os.environ.get('ALGORITHM')])
-        new_access_token = jwt.encode(
-            payload,
-            os.environ.get('SECRET_KEY'),
-            algorithm=os.environ.get('ALGORITHM'))
-        return Response({'access_token': new_access_token}, status=status.HTTP_200_OK)
+
+    def post(self, request: request.Request) -> Response:
+        refresh_token = request.data.get("refresh_token")
+        payload = decode_refresh_token(refresh_token, settings.SECRET_KEY)
+        new_access_token = encode_access_token(payload, settings.SECRET_KEY)
+        return Response(
+            {'access_token': new_access_token},
+            status=status.HTTP_200_OK
+        )

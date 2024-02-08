@@ -1,50 +1,44 @@
 import os
-from datetime import datetime, timedelta
-from django.contrib.auth import authenticate as auth
+from datetime import timedelta
+from http.client import HTTPException
 
 import jwt
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
-from .schemas import UserRegisterData
-
-from main.settings import ALGORITHM, SECRET_KEY
+from django.conf import settings
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.models import AnonymousUser
+from django.utils import timezone
+from rest_framework import status
+from ws_src.users.models import User
 
 
 def generate_token(
-        user,
-        minutes,
+    minutes: str,
+    user: AbstractBaseUser,
 ):
     payload = {
-        'id': user.id,
-        'exp': datetime.utcnow() + timedelta(minutes=int(minutes))
+        "id": str(user.id),
+        "exp": timezone.now() + timedelta(minutes=int(minutes)),
     }
     token = jwt.encode(
-        payload,
-        SECRET_KEY,
-        algorithm=os.environ.get('ALGORITHM')
+        payload, settings.SECRET_KEY, algorithm=os.environ.get("ALGORITHM")
     )
     return token
 
 
-def create_user(data: UserRegisterData):
-    User = get_user_model()
-    user = User(
-        username=data.username,
-        password=make_password(data.password),
-        email=data.email,
-        first_name=data.first_name,
-        last_name=data.last_name
-    )
-    user.save()
-    return user
+def is_authenticated(request):
+    auth_header = request.headers.get("Authorization")
+    if auth_header is None:
+        return AnonymousUser
+    token = auth_header.split(" ")[1]
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[os.environ.get("ALGORITHM")]
+        )
+    except jwt.ExpiredSignatureError:
+        return HTTPException(status=status.HTTP_403_FORBIDDEN)
+    except jwt.InvalidTokenError:
+        return HTTPException(status=status.HTTP_403_FORBIDDEN)
 
-
-def authenticate(
-        request,
-        username,
-        password
-):
-    user = auth(request, username=username, password=password)
-    if user is None:
-        return None
+    user_id = payload["id"]
+    user = User.objects.get(id=user_id)
     return user
