@@ -9,8 +9,7 @@ from ws_src.stock_market.api.serialiser import OrderSerializer
 from ws_src.stock_market.database import update_or_create_products
 from ws_src.stock_market.models import Product
 from ws_src.stock_market.schemas import OrderSchema, ProductSchema
-from ws_src.users.database import (update_or_create_user_product,
-                                   update_user_balance)
+from ws_src.users.database import update_user_balance
 from ws_src.users.permissions import IsUser
 
 
@@ -33,7 +32,7 @@ class BuyItemViewSet(mixins.CreateModelMixin, GenericViewSet):
     def perform_create(self, serializer: OrderSerializer) -> None:
         user = self.request.current_user
         order_dto = OrderSchema(user=user, **serializer.validated_data)
+
         serializer.save(**order_dto.model_dump())
 
         update_user_balance(user, order_dto)
-        update_or_create_user_product(user, order_dto)

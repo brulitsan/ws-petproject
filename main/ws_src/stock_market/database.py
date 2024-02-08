@@ -6,20 +6,17 @@ from ws_src.stock_market.models import Order, Product, ProductCategories
 from .schemas import ProductSchema
 
 
-def get_quantity(obj: Order) -> Any:
-    products = Product.objects.filter(id=obj.product_id)
-    if not products:
-        raise ValueError(f"No product with id {obj.product_id}")
-    product = products[0]
-    product_price = product.last_price
-    quantity = obj.transaction_price / product_price
+def get_quantity(order: Order) -> Any:
+    products = order.product
+    product_price = products.last_price
+    quantity = order.transaction_price / product_price
     return quantity
 
 
-def processing_quantity(attrs: OrderedDict) -> OrderedDict:
-    product = attrs.get("product")
-    attrs["quantity"] = attrs["transaction_price"] / product.last_price
-    return attrs
+def processing_quantity(order: OrderedDict) -> OrderedDict:
+    product = order.get("product")
+    order["quantity"] = order["transaction_price"] / product.last_price
+    return order
 
 
 def update_or_create_products(product_data: list[dict]) -> None:

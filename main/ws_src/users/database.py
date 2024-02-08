@@ -8,6 +8,7 @@ def update_user_balance(user: User, order_dto: OrderSchema) -> None:
     match order_dto.type:
         case BaseOrderType.SALE:
             validate_and_decrease_user_balance(user, order_dto)
+            update_or_create_user_product(user, order_dto)
         case BaseOrderType.PURCHASE if update_or_create_user_product(user, order_dto):
             increase_user_balance(user, order_dto)
 

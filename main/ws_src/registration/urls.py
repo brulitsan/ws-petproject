@@ -1,6 +1,5 @@
 from django.urls import path
-from ws_src.registration.api_handlers import (LoginView, RefreshTokenView,
-                                              RegisterUserView)
+from ws_src.registration.api_handlers import LoginView, RefreshTokenView, RegisterUserView
 
 urlpatterns = [
     path("register/", RegisterUserView.as_view()),

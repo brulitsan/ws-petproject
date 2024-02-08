@@ -4,6 +4,7 @@ from http.client import HTTPException
 
 import jwt
 from django.conf import settings
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
 from rest_framework import status
@@ -12,7 +13,7 @@ from ws_src.users.models import User
 
 def generate_token(
     minutes: str,
-    user: User = None,
+    user: AbstractBaseUser,
 ):
     payload = {
         "id": str(user.id),
@@ -33,10 +34,11 @@ def is_authenticated(request):
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[os.environ.get("ALGORITHM")]
         )
-        user_id = payload["id"]
-        user = User.objects.get(id=user_id)
-        return user
     except jwt.ExpiredSignatureError:
         return HTTPException(status=status.HTTP_403_FORBIDDEN)
     except jwt.InvalidTokenError:
         return HTTPException(status=status.HTTP_403_FORBIDDEN)
+
+    user_id = payload["id"]
+    user = User.objects.get(id=user_id)
+    return user
