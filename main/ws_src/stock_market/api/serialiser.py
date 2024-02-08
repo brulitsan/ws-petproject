@@ -13,7 +13,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
         fields = ["user", "product", "transaction_price", "type", "quantity"]
 
-    # user = serializers.PrimaryKeyRelatedField(read_only=True)
     quantity = serializers.SerializerMethodField("get_quantity_value")
 
     def get_quantity_value(self, obj: Order) -> Decimal:
@@ -21,3 +20,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def paste_quantity_to_order(self, product: OrderedDict) -> OrderedDict:
         return processing_quantity(product)
+
+    def to_internal_value(self, order: OrderedDict) -> OrderedDict:
+        data = super().to_internal_value(order)
+        order_quantity = self.paste_quantity_to_order(data)
+        print(order_quantity)
+        return order_quantity
