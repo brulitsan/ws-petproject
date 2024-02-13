@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -47,6 +47,8 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_results",
+    'django.contrib.postgres',
 ]
 
 THIRD_PARTY_APPS = [
@@ -96,7 +98,15 @@ DATABASES = {
         "USER": os.environ.get("POSTGRES_USER"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": os.environ.get("POSTGRES_HOST"),
-        "PORT": "5432",
+        "PORT": os.environ.get("POSTGRES_PORT"),
+    }
+}
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.environ.get("REDIS_CACHE_LOCATION"),
     }
 }
 
@@ -129,6 +139,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+CELERY_BROKER_URL = os.environ.get('REDIS_CONNECTION_URL')
+
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_CONNECTION_URL')
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -139,7 +155,8 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = os.environ.get('AUTH_USER_MODEL')
+
 REFRESH_TOKEN_LIFE = os.environ.get("REFRESH_TOKEN_LIFE")
 ACCESS_TOKEN_LIFE = os.environ.get("ACCESS_TOKEN_LIFE")
 ALGORITHM = os.environ.get("ALGORITHM")
