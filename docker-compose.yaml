@@ -63,7 +63,7 @@ services:
       - '6379'
 
   celery:
-    restart: always
+#    restart: always
     build:
       context: .
     command:  ['celery', '-A', 'main', 'worker']

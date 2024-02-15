@@ -12,6 +12,6 @@ COPY pyproject.toml /app/pyproject.toml
 # Only application
 FROM builder as slim
 
-COPY main /app/main
+COPY . /app/main
 
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
