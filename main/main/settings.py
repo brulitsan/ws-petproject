@@ -47,8 +47,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_celery_results",
-    'django.contrib.postgres',
+    'django_celery_results',
 ]
 
 THIRD_PARTY_APPS = [

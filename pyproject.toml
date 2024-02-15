@@ -27,6 +27,7 @@ django-celery-beat = "^2.5.0"
 django-celery-results = "^2.5.1"
 django-redis = "^5.4.0"
 netcat = "^0.0.1a0"
+kafka-python = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.0.2"
