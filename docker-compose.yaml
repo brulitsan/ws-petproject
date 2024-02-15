@@ -1,27 +1,40 @@
-version: '3'
+version: '3.9'
 
 
 services:
   ws-petproject:
-    image: app
+    image: ws_petproject
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
+    entrypoint: docker/database_entrypoint.sh
+    container_name: ws_petproject
     expose:
       - 8000
     ports:
       - 8000:8000
     environment:
-      - SECRET_KEY=$SECRET_KEY
       - ACCESS_TOKEN_LIFE=$ACCESS_TOKEN_LIFE
       - REFRESH_TOKEN_LIFE=$REFRESH_TOKEN_LIFE
       - ALGORITHM=$ALGORITHM
+      - GET_COINS_URL=$GET_COINS_URL
+      - SECRET_KEY=$SECRET_KEY
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_HOST=$POSTGRES_HOST
+      - POSTGRES_PORT=$POSTGRES_PORT
+      - ROOT_URL=$ROOT_URL
+      - REDIS_CACHE_LOCATION $REDIS_CACHE_LOCATION
+      - REDIS_CONNECTION_URL=$REDIS_CONNECTION_URL
+      - AUTH_USER_MODEL=$AUTH_USER_MODEL
+      - CELERY_RESULT_BACKEND=$CELERY_RESULT_BACKEND
     volumes:
-      - ./main/app:/app
+      - .:/app
     depends_on:
       - database
-      - celery
       - redis
+      - celery
     env_file:
       - ./.env
 
@@ -31,30 +44,38 @@ services:
       - POSTGRES_DB=$POSTGRES_DB
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_PORT=$POSTGRES_PORT
+    container_name: database
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - ${DATABASE_DIR:-./database_data}:/var/lib/postgresql/data
     env_file:
       - ./.env
 
   redis:
-    image: redis:latest
+    image: redis:alpine
     restart: always
+    container_name: redis
+    ports:
+      - '6379:6379'
+    expose:
+      - '6379'
 
   celery:
-    restart: always
+#    restart: always
     build:
       context: .
     command:  ['celery', '-A', 'main', 'worker']
     volumes:
       - ./main:/app
+    container_name: celery
     environment:
       - SECRET_KEY=$SECRET_KEY
       - POSTGRES_DB=$POSTGRES_DB
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     depends_on:
-      - database
+      - redis
     env_file:
       - ./.env

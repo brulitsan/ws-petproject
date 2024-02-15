@@ -32,7 +32,8 @@ class BuyItemViewSet(mixins.CreateModelMixin, GenericViewSet):
     def perform_create(self, serializer: OrderSerializer) -> None:
         user = self.request.current_user
         order_dto = OrderSchema(user=user, **serializer.validated_data)
-
         serializer.save(**order_dto.model_dump())
 
         update_user_balance(user, order_dto)
+
+# class AutomaticOperationsViewSet(GenericViewSet):
