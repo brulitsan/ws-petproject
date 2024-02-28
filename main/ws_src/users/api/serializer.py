@@ -4,5 +4,4 @@ from rest_framework import serializers
 
 
 class UserTextSerializer(serializers.Serializer):
-    text = serializers.CharField()
-    # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    text = serializers.CharField(max_length=500)

@@ -9,6 +9,7 @@ done
 echo "PostgreSQL started"
 
 cd main
+
 poetry run python manage.py runserver ${ROOT_URL}
 
 exec "$@"

@@ -13,22 +13,6 @@ services:
       - 8000
     ports:
       - 8000:8000
-    environment:
-      - ACCESS_TOKEN_LIFE=$ACCESS_TOKEN_LIFE
-      - REFRESH_TOKEN_LIFE=$REFRESH_TOKEN_LIFE
-      - ALGORITHM=$ALGORITHM
-      - GET_COINS_URL=$GET_COINS_URL
-      - SECRET_KEY=$SECRET_KEY
-      - POSTGRES_DB=$POSTGRES_DB
-      - POSTGRES_USER=$POSTGRES_USER
-      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-      - POSTGRES_HOST=$POSTGRES_HOST
-      - POSTGRES_PORT=$POSTGRES_PORT
-      - ROOT_URL=$ROOT_URL
-      - REDIS_CACHE_LOCATION $REDIS_CACHE_LOCATION
-      - REDIS_CONNECTION_URL=$REDIS_CONNECTION_URL
-      - AUTH_USER_MODEL=$AUTH_USER_MODEL
-      - CELERY_RESULT_BACKEND=$CELERY_RESULT_BACKEND
     volumes:
       - .:/app
     depends_on:
@@ -37,6 +21,8 @@ services:
       - celery
     env_file:
       - ./.env
+    networks:
+      - default
 
   database:
     image: postgres:13
@@ -47,11 +33,13 @@ services:
       - POSTGRES_PORT=$POSTGRES_PORT
     container_name: database
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
       - ${DATABASE_DIR:-./database_data}:/var/lib/postgresql/data
     env_file:
       - ./.env
+    networks:
+      - default
 
   redis:
     image: redis:alpine
@@ -61,6 +49,8 @@ services:
       - '6379:6379'
     expose:
       - '6379'
+    networks:
+      - default
 
   celery:
 #    restart: always
@@ -75,7 +65,16 @@ services:
       - POSTGRES_DB=$POSTGRES_DB
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - REDIS_CONNECTION_URL=$REDIS_CONNECTION_URL
+      - REDIS_CACHE_LOCATION=$REDIS_CACHE_LOCATION
     depends_on:
       - redis
     env_file:
       - ./.env
+    networks:
+      - default
+
+networks:
+  default:
+    external: true
+    name: trading

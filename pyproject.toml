@@ -28,6 +28,8 @@ django-celery-results = "^2.5.1"
 django-redis = "^5.4.0"
 netcat = "^0.0.1a0"
 kafka-python = "^2.0.2"
+pytest = "^8.0.0"
+aiokafka = "^0.10.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.0.2"

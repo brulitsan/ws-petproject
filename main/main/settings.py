@@ -144,6 +144,10 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 CELERY_RESULT_BACKEND = os.environ.get('REDIS_CONNECTION_URL')
 
+KAFKA_BOOTSTRAP_SERVERS = 'localhost:9092'
+KAFKA_TOPIC = 'test_topic'
+KAFKA_GROUP_ID = 'test_group'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
