@@ -26,3 +26,7 @@ class OrderSerializer(serializers.ModelSerializer):
         order_quantity = self.paste_quantity_to_order(data)
         print(order_quantity)
         return order_quantity
+
+
+class UserTextSerializer(serializers.Serializer):
+    text = serializers.CharField(max_length=500)

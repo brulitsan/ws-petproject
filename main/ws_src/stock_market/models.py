@@ -24,7 +24,7 @@ class Product(models.Model):
         verbose_name = "Product"
         verbose_name_plural = "Products"
 
-    id: str = models.CharField(primary_key=True, editable=False)
+    id: str = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4())
     symbol: str = models.CharField(max_length=100, unique=True)
     last_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
     high_price: Decimal = models.DecimalField(max_digits=10, decimal_places=3)

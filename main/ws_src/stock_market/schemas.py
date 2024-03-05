@@ -6,7 +6,6 @@ from ws_src.users.models import User
 
 
 class ProductSchema(BaseModel):
-    id: str = Field(alias="_id")
     symbol: str
     last_price: Decimal = Field(alias="lastPrice")
     high_price: Decimal = Field(alias="highPrice")

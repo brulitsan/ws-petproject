@@ -8,7 +8,9 @@ app = Celery('main')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
-
-@app.task(bind=True)
-def debug_task(self):
-    print(f'Request: {self.request!r}')
+app.conf.beat_schedule = {
+    'start_kafka_consumer': {
+        'task': 'ws_src.stock_market.tasks.start_kafka_consumer',
+        'schedule': 10.0,
+    },
+}
