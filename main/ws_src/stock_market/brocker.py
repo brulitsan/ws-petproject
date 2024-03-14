@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
 
@@ -24,5 +26,7 @@ def kafka_consumer():
             for topic_partition, records in message.items():  # pylint: disable=unused-variable
                 for record in records:
                     value = record.value.decode()
-                    update_or_create_products(value)
+                    value = json.loads(value)
+                    for product_value in value:
+                        update_or_create_products(product_value)
             consumer.commit()
