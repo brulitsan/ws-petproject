@@ -1,4 +1,4 @@
-import json
+
 from collections import OrderedDict
 from typing import Any
 
@@ -20,10 +20,10 @@ def processing_quantity(order: OrderedDict) -> OrderedDict:
     return order
 
 
-def update_or_create_products(product_data: list[str]) -> None:
-    value_dict = json.loads(product_data)
-    for item in value_dict:
-        item = ProductSchema(**item)
-        ProductCategories.objects.get_or_create(name=item.symbol)
-        Product.objects.update_or_create(symbol=item.symbol, defaults=item.model_dump())
-    return value_dict
+def update_or_create_products(product_data: dict) -> None:
+    item = ProductSchema(**product_data)
+    ProductCategories.objects.get_or_create(name=item.symbol)
+    Product.objects.update_or_create(
+        symbol=item.symbol,
+        defaults=item.model_dump()
+    )

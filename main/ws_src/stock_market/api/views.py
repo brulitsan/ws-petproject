@@ -14,8 +14,6 @@ from ws_src.stock_market.schemas import OrderSchema, ProductSchema
 from ws_src.users.database import update_user_balance
 from ws_src.users.permissions import IsAdmin, IsUser
 
-# from ws_src.stock_market.tasks import consume_crypto_info
-
 
 class StockMarketViewSet(viewsets.ViewSet):
     schema = ProductSchema
@@ -53,4 +51,4 @@ class GetCurrencyInfo(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         text = serializer.validated_data['text']
         send_currency_info_request(text)
-        return Response({'text': text})
+        return Response({'added': text})
