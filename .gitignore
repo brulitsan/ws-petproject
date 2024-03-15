@@ -1,9 +1,9 @@
 .venv
 .idea
 *.sqlite3
-.env
 __pycache__/
 database_data
 .mypy_cache
 mongo_data
 broker_data/
+.env

@@ -1,5 +1,0 @@
-#
-#
-#
-# class UserView:
-#     pass

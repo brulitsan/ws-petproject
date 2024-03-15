@@ -28,7 +28,6 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -48,6 +47,7 @@ DJANGO_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'django_celery_results',
+    'django_celery_beat',
 ]
 
 THIRD_PARTY_APPS = [
@@ -101,7 +101,6 @@ DATABASES = {
     }
 }
 
-
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
@@ -143,6 +142,9 @@ CELERY_BROKER_URL = os.environ.get('REDIS_CONNECTION_URL')
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 CELERY_RESULT_BACKEND = os.environ.get('REDIS_CONNECTION_URL')
+
+KAFKA_BROKER_PATH = os.environ.get('KAFKA_BROKER_PATH')
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
