@@ -1,22 +1,17 @@
 # install requirements
-FROM python:3.11
-
+FROM python:3.11 as builder
 
 WORKDIR /app
 
-COPY . /app
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
 RUN pip install poetry==1.7.1
+RUN apt-get update && apt-get install -y netcat-openbsd
 
-COPY ./poetry.lock /app/poetry.lock
-COPY ./pyproject.toml /app/pyproject.toml
+COPY poetry.lock /app/poetry.lock
+COPY pyproject.toml /app/pyproject.toml
 
-EXPOSE 8000
+# Only application
+FROM builder as slim
 
+COPY . /app/
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-
-
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi

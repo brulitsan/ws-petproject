@@ -1,0 +1,48 @@
+cortex:
+  cache_dir: None
+
+
+repos:
+  -   repo: https://github.com/pre-commit/mirrors-isort
+      rev: 'v5.10.1'
+      hooks:
+        - id: isort
+          args: [
+            '--settings', 'lint-configs/.isort.cfg',
+          ]
+
+  -   repo: https://github.com/PyCQA/flake8
+      rev: '6.1.0'
+      hooks:
+        - id: flake8
+          args: [
+            '--config', 'lint-configs/.flake8',
+          ]
+          exclude: "migrations"
+
+  -   repo: https://github.com/pre-commit/mirrors-mypy
+      rev: 'v1.5.1'
+      hooks:
+        -   id: mypy
+            args: [
+              '--namespace-packages', '--explicit-package-bases',
+              '--config-file', 'lint-configs/mypy.ini'
+            ]
+            additional_dependencies:
+              - django-stubs
+              - python-dotenv
+              - psycopg2
+              - djangorestframework
+              - pyjwt
+              - pytest
+              - celery
+              - django-storages
+            exclude: "tests|conftest.py|migrations"
+
+  -   repo: https://github.com/pre-commit/mirrors-pylint
+      rev: 'v3.0.0a5'
+      hooks:
+        -   id: pylint
+            args: [
+              '--rcfile', 'lint-configs/.pylintrc'
+            ]
