@@ -1,45 +1,48 @@
-import os
-
-import requests
 from django.http import HttpRequest
-from rest_framework import generics, mixins, viewsets
-from rest_framework.request import Request
+from rest_framework import generics, mixins
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from ws_src.stock_market.api.serialiser import OrderSerializer, UserTextSerializer
+from stock_market.database import auto_operations
+from ws_src.stock_market.api.serialiser import (
+    AutoOperationsOrderSerializer,
+    OrderSerializer,
+    UserTextSerializer,
+)
 from ws_src.stock_market.brocker import send_currency_info_request
-from ws_src.stock_market.database import update_or_create_products
 from ws_src.stock_market.models import Product
-from ws_src.stock_market.schemas import OrderSchema, ProductSchema
+from ws_src.stock_market.schemas import AutoOperationsOrderSchema, OrderSchema
 from ws_src.users.database import update_user_balance
 from ws_src.users.permissions import IsAdmin, IsUser
-
-
-class StockMarketViewSet(viewsets.ViewSet):
-    schema = ProductSchema
-
-    def list(self, request: Request) -> Response:
-        url = os.environ.get("GET_COINS_URL")
-        response = requests.get(url)
-        crypto_list = response.json()
-        update_or_create_products(crypto_list)
-        return Response(crypto_list)
 
 
 class BuyItemViewSet(mixins.CreateModelMixin, GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = (IsUser,)
+    permission_classes = [IsUser, ]
 
     def perform_create(self, serializer: OrderSerializer) -> None:
         user = self.request.current_user
         order_dto = OrderSchema(user=user, **serializer.validated_data)
+
+        order_dto.update_quantity()
+        order_status = update_user_balance(user=user, order_dto=order_dto)
+        order_dto.update_status_based_on_validation(order_status)
         serializer.save(**order_dto.model_dump())
 
-        update_user_balance(user, order_dto)
 
+class AutomaticOperationsViewSet(mixins.CreateModelMixin, GenericViewSet):
+    queryset = Product.objects.all()
+    serializer_class = AutoOperationsOrderSerializer
+    permission_classes = [IsUser, ]
 
-# class AutomaticOperationsViewSet(GenericViewSet)
+    def perform_create(self, serializer: OrderSerializer) -> None:
+        user = self.request.current_user
+        order_dto = AutoOperationsOrderSchema(user=user, **serializer.validated_data)
+
+        order_dto.update_quantity()
+        order_status = auto_operations(user=user, order_dto=order_dto)
+        order_dto.update_status_based_on_validation(order_status.status)
+        serializer.save(**order_dto.model_dump())
 
 
 class GetCurrencyInfo(generics.GenericAPIView):

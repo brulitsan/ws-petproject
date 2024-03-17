@@ -13,4 +13,8 @@ app.conf.beat_schedule = {
         'task': 'ws_src.stock_market.tasks.start_kafka_consumer',
         'schedule': 10.0,
     },
+    'automatic_operations': {
+        'task': 'ws_src.stock_market.tasks.automatic_operations',
+        'schedule': 5.0,
+    },
 }

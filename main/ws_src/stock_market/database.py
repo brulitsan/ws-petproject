@@ -1,10 +1,11 @@
-
 from collections import OrderedDict
 from typing import Any
 
+from ws_src.common.choices import BaseOrderStatus, BaseOrderType
 from ws_src.stock_market.models import Order, Product, ProductCategories
-
-from .schemas import ProductSchema
+from ws_src.stock_market.schemas import AutoOperationsOrderSchema, ProductSchema
+from ws_src.users.database import update_user_balance
+from ws_src.users.models import User
 
 
 def get_quantity(order: Order) -> Any:
@@ -14,10 +15,10 @@ def get_quantity(order: Order) -> Any:
     return quantity
 
 
-def processing_quantity(order: OrderedDict) -> OrderedDict:
+def processing_quantity(order: OrderedDict) -> str:
     product = order.get("product")
     order["quantity"] = order["transaction_price"] / product.last_price
-    return order
+    return order["quantity"]
 
 
 def update_or_create_products(product_data: dict) -> None:
@@ -27,3 +28,26 @@ def update_or_create_products(product_data: dict) -> None:
         symbol=item.symbol,
         defaults=item.model_dump()
     )
+
+
+def auto_operations(user: User, order_dto: AutoOperationsOrderSchema):
+    match order_dto.type:
+        case BaseOrderType.AUTO_SALE:
+            validate_order_sale(user, order_dto)
+        case BaseOrderType.AUTO_PURCHASE:
+            validate_order_purchase(user, order_dto)
+    return order_dto
+
+
+def validate_order_sale(user: User, order_dto: AutoOperationsOrderSchema) -> None:
+    if order_dto.currency_price < order_dto.product.last_price:
+        order_dto.status = BaseOrderStatus.in_process
+    else:
+        update_user_balance(user, order_dto)
+
+
+def validate_order_purchase(user: User, order_dto: AutoOperationsOrderSchema) -> None:
+    if order_dto.currency_price > order_dto.product.last_price:
+        order_dto.status = BaseOrderStatus.in_process
+    else:
+        update_user_balance(user, order_dto)

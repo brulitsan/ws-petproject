@@ -1,9 +1,9 @@
 from django.urls import path
 
-from .views import BuyItemViewSet, GetCurrencyInfo, StockMarketViewSet
+from .views import AutomaticOperationsViewSet, BuyItemViewSet, GetCurrencyInfo
 
 urlpatterns = [
-    path("get_coins/", StockMarketViewSet.as_view({"get": "list"})),
     path("buy_coins/", BuyItemViewSet.as_view({"post": "create"})),
-    path("get_coins_info/", GetCurrencyInfo.as_view())
+    path("get_coins_info/", GetCurrencyInfo.as_view()),
+    path("auto_buy_coins/", AutomaticOperationsViewSet.as_view({"post": "create"}))
 ]

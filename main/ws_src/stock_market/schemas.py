@@ -1,6 +1,8 @@
 from decimal import Decimal
+from typing import Optional
 
 from pydantic import BaseModel, Field
+from ws_src.common.choices import BaseOrderStatus
 from ws_src.stock_market.models import Product
 from ws_src.users.models import User
 
@@ -16,8 +18,21 @@ class OrderSchema(BaseModel):
     user: User
     product: Product
     transaction_price: Decimal
-    quantity: Decimal
+    quantity: Optional[Decimal] = None
     type: str
+    status: str = BaseOrderStatus.in_process
 
     class Config:
         arbitrary_types_allowed = True
+
+    def update_status_based_on_validation(self, status: str) -> None:
+        self.status = status
+
+    def update_quantity(self) -> None:
+        product_price = self.product.last_price
+        quantity = self.transaction_price / product_price
+        self.quantity = quantity
+
+
+class AutoOperationsOrderSchema(OrderSchema):
+    currency_price: Decimal

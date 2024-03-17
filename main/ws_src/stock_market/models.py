@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
-from ws_src.common.choices import BaseOrderType, BaseProductType
+from ws_src.common.choices import BaseOrderStatus, BaseOrderType, BaseProductType
 from ws_src.common.models import BaseModel
 
 
@@ -38,3 +38,10 @@ class Order(models.Model):
     quantity: Decimal = models.DecimalField(max_digits=10, decimal_places=4)
     type: str = models.CharField(choices=BaseOrderType.choices, max_length=30)
     created_at: datetime = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(choices=BaseOrderStatus.choices, max_length=30)
+    currency_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        if self.currency_price is None:
+            self.currency_price = self.product.last_price
+        super().save(*args, **kwargs)
