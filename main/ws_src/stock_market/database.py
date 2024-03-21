@@ -1,7 +1,6 @@
 from collections import OrderedDict
 from typing import Any
 
-from stock_market.exceptions import CurrencyPriceException, ProductPriceException
 from ws_src.common.choices import BaseOrderStatus, BaseOrderType
 from ws_src.stock_market.models import Order, Product, ProductCategories
 from ws_src.stock_market.schemas import AutoOperationsOrderSchema, ProductSchema
@@ -45,12 +44,10 @@ def auto_operations(user: User, order_dto: AutoOperationsOrderSchema):
 def validate_order_sale(user: User, order_dto: AutoOperationsOrderSchema) -> None:
     if order_dto.currency_price > order_dto.product.last_price:
         update_user_balance(user, order_dto)
-        raise ProductPriceException
     order_dto.status = BaseOrderStatus.in_process
 
 
 def validate_order_purchase(user: User, order_dto: AutoOperationsOrderSchema) -> None:
     if order_dto.currency_price < order_dto.product.last_price:
         update_user_balance(user, order_dto)
-        raise CurrencyPriceException
     order_dto.status = BaseOrderStatus.in_process
