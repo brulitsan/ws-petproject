@@ -31,7 +31,7 @@ class Product(models.Model):
     low_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
 
 
-class Order(models.Model):
+class Order(BaseModel):
     product: str = models.ForeignKey(Product, on_delete=models.PROTECT)
     user: uuid.UUID = models.ForeignKey("users.User", on_delete=models.PROTECT)
     transaction_price: Decimal = models.DecimalField(max_digits=10, decimal_places=3)
