@@ -3,7 +3,7 @@ version: '3.9'
 
 services:
   ws_petproject:
-    image: ws_petproject
+    image: ws-petproject
     build:
       context: .
       dockerfile: Dockerfile

@@ -29,9 +29,6 @@ class User(AbstractUser, BaseModel):
         related_query_name="user",
     )
 
-    def __str__(self):
-        return f"username {self.username} | user id - {self.id}"
-
 
 class UserProfile(BaseModel):
     user: uuid.UUID = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
@@ -43,6 +40,3 @@ class UserProduct(BaseModel):
     user_product: Decimal = models.ForeignKey("stock_market.Product", on_delete=models.PROTECT)
     quantity: Decimal = models.DecimalField(max_digits=10, decimal_places=3)
     price: Decimal = models.DecimalField(max_digits=10, decimal_places=3)
-
-    def __str__(self):
-        return f" user - {self.user_id} | product - {self.user_product_id}"
