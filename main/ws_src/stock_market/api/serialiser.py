@@ -7,14 +7,15 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         read_only_fields = ('user', 'status', 'quantity', 'currency_price')
 
-        fields = ["user",
-                  "product",
-                  "transaction_price",
-                  "type",
-                  "quantity",
-                  "status",
-                  "currency_price"
-                  ]
+        fields = [
+            "user",
+            "product",
+            "transaction_price",
+            "type",
+            "quantity",
+            "status",
+            "currency_price"
+        ]
 
 
 class AutoOperationsOrderSerializer(serializers.ModelSerializer):

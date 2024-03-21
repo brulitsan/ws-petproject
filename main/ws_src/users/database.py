@@ -1,3 +1,4 @@
+from stock_market.exceptions import UserBalanceException
 from ws_src.common.choices import BaseOrderStatus, BaseOrderType
 from ws_src.stock_market.schemas import OrderSchema
 from ws_src.users.models import User, UserProduct
@@ -17,10 +18,11 @@ def update_user_balance(user: User, order_dto: OrderSchema) -> str:
 def validate_and_decrease_user_balance(user: User, order_dto: OrderSchema) -> None:
     if user.balance < order_dto.transaction_price:
         order_dto.status = BaseOrderStatus.cancelled
-    else:
-        user.balance -= order_dto.transaction_price
-        order_dto.status = BaseOrderStatus.success
-        user.save(update_fields=["balance"])
+        raise UserBalanceException
+
+    user.balance -= order_dto.transaction_price
+    order_dto.status = BaseOrderStatus.success
+    user.save(update_fields=["balance"])
 
 
 def increase_user_balance(user: User, order_dto: OrderSchema) -> None:
@@ -73,8 +75,8 @@ def validate_and_decrease_user_product(
     if (user_product.quantity < order_dto.quantity
             or user_product.price < order_dto.transaction_price):
         order_dto.status = BaseOrderStatus.cancelled
-    else:
-        user_product.quantity -= order_dto.quantity
-        user_product.price -= order_dto.transaction_price
-        order_dto.status = BaseOrderStatus.success
-        user_product.save(update_fields=["quantity", "price"])
+        raise UserBalanceException
+    user_product.quantity -= order_dto.quantity
+    user_product.price -= order_dto.transaction_price
+    order_dto.status = BaseOrderStatus.success
+    user_product.save(update_fields=["quantity", "price"])

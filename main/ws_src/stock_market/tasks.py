@@ -18,12 +18,5 @@ def automatic_operations():
         type__in=[BaseOrderType.AUTO_PURCHASE, BaseOrderType.AUTO_SALE]
     )
     for order in orders:
-        order_dto = AutoOperationsOrderSchema(
-            user=order.user,
-            product=order.product,
-            transaction_price=order.transaction_price,
-            quantity=order.quantity,
-            type=order.type,
-            status=order.status,
-            currency_price=order.currency_price)
+        order_dto = AutoOperationsOrderSchema.model_validate(order)
         auto_operations(user=order.user, order_dto=order_dto)

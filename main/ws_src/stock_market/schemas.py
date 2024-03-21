@@ -24,9 +24,7 @@ class OrderSchema(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-
-    def update_status_based_on_validation(self, status: str) -> None:
-        self.status = status
+        from_attributes = True
 
     def update_quantity(self) -> None:
         product_price = self.product.last_price

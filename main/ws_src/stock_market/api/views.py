@@ -18,7 +18,7 @@ from ws_src.users.permissions import IsAdmin, IsUser
 class BuyItemViewSet(mixins.CreateModelMixin, GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsUser, ]
+    permission_classes = [IsUser]
 
     def perform_create(self, serializer: OrderSerializer) -> None:
         user = self.request.current_user
@@ -26,14 +26,14 @@ class BuyItemViewSet(mixins.CreateModelMixin, GenericViewSet):
 
         order_dto.update_quantity()
         order_status = update_user_balance(user=user, order_dto=order_dto)
-        order_dto.update_status_based_on_validation(order_status)
+        order_dto.status = order_status
         serializer.save(**order_dto.model_dump())
 
 
 class AutomaticOperationsViewSet(mixins.CreateModelMixin, GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = AutoOperationsOrderSerializer
-    permission_classes = [IsUser, ]
+    permission_classes = [IsUser]
 
     def perform_create(self, serializer: OrderSerializer) -> None:
         user = self.request.current_user
@@ -41,13 +41,13 @@ class AutomaticOperationsViewSet(mixins.CreateModelMixin, GenericViewSet):
 
         order_dto.update_quantity()
         order_status = auto_operations(user=user, order_dto=order_dto)
-        order_dto.update_status_based_on_validation(order_status.status)
+        order_dto.status = order_status
         serializer.save(**order_dto.model_dump())
 
 
 class GetCurrencyInfo(generics.GenericAPIView):
     serializer_class = UserTextSerializer
-    permission_classes = [IsAdmin, ]
+    permission_classes = [IsAdmin]
 
     def post(self, request: HttpRequest) -> Response:
         serializer = self.get_serializer(data=request.data)

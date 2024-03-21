@@ -1,9 +1,13 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import SimpleRouter
 
 from .views import AutomaticOperationsViewSet, BuyItemViewSet, GetCurrencyInfo
 
+router = SimpleRouter()
+router.register(r'buy_coins', BuyItemViewSet, basename='buy-item')
+router.register(r'auto_buy_coins', AutomaticOperationsViewSet, basename='auto-buy-item')
+
 urlpatterns = [
-    path("buy_coins/", BuyItemViewSet.as_view({"post": "create"})),
+    path('', include(router.urls)),
     path("get_coins_info/", GetCurrencyInfo.as_view()),
-    path("auto_buy_coins/", AutomaticOperationsViewSet.as_view({"post": "create"}))
 ]
