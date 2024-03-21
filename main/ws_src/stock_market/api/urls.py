@@ -1,7 +1,11 @@
+from ws_src.stock_market.api.views import (
+    AutomaticOperationsViewSet,
+    BuyItemViewSet,
+    GetCurrencyInfo,
+)
+
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
-
-from .views import AutomaticOperationsViewSet, BuyItemViewSet, GetCurrencyInfo
 
 router = SimpleRouter()
 router.register('buy_coins', BuyItemViewSet)

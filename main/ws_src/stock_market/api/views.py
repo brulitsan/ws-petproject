@@ -1,7 +1,3 @@
-from django.http import HttpRequest
-from rest_framework import generics, mixins
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 from ws_src.stock_market.api.serialiser import (
     AutoOperationsOrderSerializer,
     OrderSerializer,
@@ -13,6 +9,11 @@ from ws_src.stock_market.models import Product
 from ws_src.stock_market.schemas import AutoOperationsOrderSchema, OrderSchema
 from ws_src.users.database import update_user_balance
 from ws_src.users.permissions import IsAdmin, IsUser
+
+from django.http import HttpRequest
+from rest_framework import generics, mixins
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 
 class BuyItemViewSet(mixins.CreateModelMixin, GenericViewSet):
