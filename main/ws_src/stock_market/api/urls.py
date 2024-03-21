@@ -4,8 +4,8 @@ from rest_framework.routers import SimpleRouter
 from .views import AutomaticOperationsViewSet, BuyItemViewSet, GetCurrencyInfo
 
 router = SimpleRouter()
-router.register(r'buy_coins', BuyItemViewSet, basename='buy-item')
-router.register(r'auto_buy_coins', AutomaticOperationsViewSet, basename='auto-buy-item')
+router.register('buy_coins', BuyItemViewSet)
+router.register('auto_buy_coins', AutomaticOperationsViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

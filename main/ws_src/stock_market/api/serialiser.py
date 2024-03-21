@@ -23,14 +23,15 @@ class AutoOperationsOrderSerializer(serializers.ModelSerializer):
         model = Order
         read_only_fields = ('user', 'status', 'quantity')
 
-        fields = ["user",
-                  "product",
-                  "transaction_price",
-                  "type",
-                  "quantity",
-                  "status",
-                  "currency_price"
-                  ]
+        fields = [
+            "user",
+            "product",
+            "transaction_price",
+            "type",
+            "quantity",
+            "status",
+            "currency_price"
+        ]
 
 
 class UserTextSerializer(serializers.Serializer):

@@ -7,6 +7,11 @@ from ws_src.stock_market.models import Product
 from ws_src.users.models import User
 
 
+class BaseModelConfig:
+    arbitrary_types_allowed = True
+    from_attributes = True
+
+
 class ProductSchema(BaseModel):
     symbol: str
     last_price: Decimal = Field(alias="lastPrice")
@@ -22,9 +27,8 @@ class OrderSchema(BaseModel):
     type: str
     status: str = BaseOrderStatus.in_process
 
-    class Config:
-        arbitrary_types_allowed = True
-        from_attributes = True
+    class Config(BaseModelConfig):
+        pass
 
     def update_quantity(self) -> None:
         product_price = self.product.last_price
