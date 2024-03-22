@@ -1,10 +1,10 @@
-import uuid
-from datetime import datetime
 from decimal import Decimal
 
-from django.db import models
+import uuid
 from ws_src.common.choices import BaseOrderStatus, BaseOrderType, BaseProductType
 from ws_src.common.models import BaseModel
+
+from django.db import models
 
 
 class ProductCategories(BaseModel):
@@ -37,7 +37,6 @@ class Order(BaseModel):
     transaction_price: Decimal = models.DecimalField(max_digits=10, decimal_places=3)
     quantity: Decimal = models.DecimalField(max_digits=10, decimal_places=4)
     type: str = models.CharField(choices=BaseOrderType.choices, max_length=30)
-    created_at: datetime = models.DateTimeField(auto_now_add=True)
     status = models.CharField(choices=BaseOrderStatus.choices, max_length=30)
     currency_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
 
