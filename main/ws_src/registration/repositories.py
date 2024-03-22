@@ -1,6 +1,7 @@
 import os
 
 import jwt
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 

@@ -1,11 +1,12 @@
-import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from django.contrib.auth.models import AbstractUser, Group
-from django.db import models
+import uuid
 from ws_src.common.choices import BaseUserTypes
 from ws_src.common.models import BaseModel
+
+from django.contrib.auth.models import AbstractUser, Group
+from django.db import models
 
 
 class User(AbstractUser, BaseModel):
