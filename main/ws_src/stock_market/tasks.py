@@ -38,16 +38,17 @@ def send_emails() -> None:
     )
     message = ""
     for order in updated_orders:
-        if order.type == BaseOrderType.AUTO_SALE:
-            message = f'Currency {order.product.symbol} sealed!'
-        if order.type == BaseOrderType.AUTO_PURCHASE:
-            message = f'Currency {order.product.symbol} purchased!'
-        from_email = EMAIL_HOST_USER
-        to_email_list = [order.user.email]
-        send_mail(
-            "automatic operations",
-            message,
-            from_email,
-            to_email_list,
-            fail_silently=False,
-        )
+        if order.status == BaseOrderStatus.success:
+            if order.type == BaseOrderType.AUTO_SALE:
+                message = f'Currency {order.product.symbol} sealed!'
+            if order.type == BaseOrderType.AUTO_PURCHASE:
+                message = f'Currency {order.product.symbol} purchased!'
+            from_email = EMAIL_HOST_USER
+            to_email_list = [order.user.email]
+            send_mail(
+                "automatic operations",
+                message,
+                from_email,
+                to_email_list,
+                fail_silently=False,
+            )
