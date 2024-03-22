@@ -1,5 +1,6 @@
-from django.contrib.auth.models import AnonymousUser
 from ws_src.registration.dependencies import is_authenticated
+
+from django.contrib.auth.models import AnonymousUser
 
 
 class AuthMiddleware:

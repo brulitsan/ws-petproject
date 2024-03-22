@@ -1,7 +1,8 @@
 import json
 
-from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
+
+from django.conf import settings
 
 from .database import update_or_create_products
 

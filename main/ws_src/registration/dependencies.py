@@ -3,12 +3,13 @@ from datetime import timedelta
 from http.client import HTTPException
 
 import jwt
+from ws_src.users.models import User
+
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
 from rest_framework import status
-from ws_src.users.models import User
 
 
 def generate_token(

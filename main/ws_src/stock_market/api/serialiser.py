@@ -1,5 +1,6 @@
-from rest_framework import serializers
 from ws_src.stock_market.models import Order
+
+from rest_framework import serializers
 
 
 class OrderSerializer(serializers.ModelSerializer):
