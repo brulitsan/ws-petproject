@@ -1,8 +1,9 @@
 from typing import Any
 
+from ws_src.common.choices import BaseUserTypes
+
 from rest_framework import permissions, request
 from rest_framework.viewsets import ViewSet
-from ws_src.common.choices import BaseUserTypes
 
 
 class IsUser(permissions.BasePermission):
