@@ -1,22 +1,27 @@
-from rest_framework.exceptions import ValidationError
-from ws_src.common.choices import BaseOrderType
+from stock_market.exceptions import UserBalanceException
+from ws_src.common.choices import BaseOrderStatus, BaseOrderType
 from ws_src.stock_market.schemas import OrderSchema
 from ws_src.users.models import User, UserProduct
 
 
-def update_user_balance(user: User, order_dto: OrderSchema) -> None:
+def update_user_balance(user: User, order_dto: OrderSchema) -> str:
     match order_dto.type:
-        case BaseOrderType.SALE:
+        case BaseOrderType.SALE | BaseOrderType.AUTO_SALE:
             validate_and_decrease_user_balance(user, order_dto)
             update_or_create_user_product(user, order_dto)
-        case BaseOrderType.PURCHASE if update_or_create_user_product(user, order_dto):
-            increase_user_balance(user, order_dto)
+        case BaseOrderType.PURCHASE | BaseOrderType.AUTO_PURCHASE:
+            if update_or_create_user_product(user, order_dto):
+                increase_user_balance(user, order_dto)
+    return order_dto.status
 
 
 def validate_and_decrease_user_balance(user: User, order_dto: OrderSchema) -> None:
     if user.balance < order_dto.transaction_price:
-        raise ValidationError("not enough funds to make a purchase")
+        order_dto.status = BaseOrderStatus.cancelled
+        raise UserBalanceException
+
     user.balance -= order_dto.transaction_price
+    order_dto.status = BaseOrderStatus.success
     user.save(update_fields=["balance"])
 
 
@@ -69,7 +74,9 @@ def validate_and_decrease_user_product(
 ) -> None:
     if (user_product.quantity < order_dto.quantity
             or user_product.price < order_dto.transaction_price):
-        raise ValidationError("invalid quantity or price")
+        order_dto.status = BaseOrderStatus.cancelled
+        raise UserBalanceException
     user_product.quantity -= order_dto.quantity
     user_product.price -= order_dto.transaction_price
+    order_dto.status = BaseOrderStatus.success
     user_product.save(update_fields=["quantity", "price"])
